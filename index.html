@@ -1,1 +1,1117 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HansPaul Kafe — Praha Dejvice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
 
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --espresso: #1A0F06;
+    --mocha: #3D2314;
+    --caramel: #C4852A;
+    --gold: #D4A853;
+    --foam: #FAF7F2;
+    --steam: rgba(196,133,42,0.15);
+    --ink: #0E0906;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--espresso);
+    overflow-x: hidden;
+  }
+
+  /* ─── LOADER ─── */
+  #loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--espresso);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 24px;
+  }
+  .loader-cup {
+    width: 60px; height: 50px;
+    position: relative;
+  }
+  .loader-cup svg { width: 100%; height: 100%; }
+  .steam-line {
+    position: absolute; top: -22px;
+    width: 3px; height: 20px;
+    background: var(--caramel);
+    border-radius: 2px;
+    animation: steamRise 1.4s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+  .steam-line:nth-child(1) { left: 16px; animation-delay: 0s; }
+  .steam-line:nth-child(2) { left: 28px; animation-delay: 0.25s; }
+  .steam-line:nth-child(3) { left: 40px; animation-delay: 0.5s; }
+  @keyframes steamRise {
+    0%   { opacity: 0; transform: translateY(0) scaleY(0.3); }
+    40%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-18px) scaleY(1.2); }
+  }
+  .loader-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem; font-weight: 300;
+    color: var(--cream); letter-spacing: 0.25em;
+    animation: fadeInOut 2s ease-in-out infinite;
+  }
+  @keyframes fadeInOut { 0%,100%{opacity:.4} 50%{opacity:1} }
+  .loader-bar {
+    width: 160px; height: 2px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 2px; overflow: hidden;
+  }
+  .loader-fill {
+    height: 100%; background: var(--caramel);
+    animation: fill 2.5s ease-out forwards;
+  }
+  @keyframes fill { from{width:0} to{width:100%} }
+  #loader.hide { animation: loaderOut 0.6s ease forwards; pointer-events: none; }
+  @keyframes loaderOut {
+    to { opacity: 0; transform: scale(1.03); }
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 20px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: transparent;
+    transition: background 0.4s, padding 0.4s, backdrop-filter 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(26,15,6,0.92);
+    backdrop-filter: blur(12px);
+    padding: 14px 40px;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem; font-weight: 600;
+    color: var(--cream); letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a {
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--cream);
+    text-decoration: none; opacity: 0.75;
+    transition: opacity 0.2s, color 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; color: var(--gold); }
+  .lang-switcher { display: flex; gap: 8px; }
+  .lang-btn {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--cream);
+    background: none; border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 9px; border-radius: 2px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lang-btn.active, .lang-btn:hover {
+    background: var(--caramel); border-color: var(--caramel); color: white;
+  }
+  .burger {
+    display: none; flex-direction: column; gap: 5px;
+    background: none; border: none; cursor: pointer; padding: 4px;
+  }
+  .burger span {
+    display: block; width: 24px; height: 2px;
+    background: var(--cream); border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    height: 100vh; min-height: 600px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: var(--espresso);
+  }
+  /* Animated coffee rings */
+  .ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(196,133,42,0.12);
+    animation: expand 8s ease-in-out infinite;
+  }
+  .ring:nth-child(1) { width: 400px; height: 400px; top: 20%; left: 15%; animation-delay: 0s; }
+  .ring:nth-child(2) { width: 600px; height: 600px; top: 10%; left: 5%; animation-delay: 1.5s; }
+  .ring:nth-child(3) { width: 800px; height: 800px; top: 0%; left: -5%; animation-delay: 3s; }
+  .ring:nth-child(4) { width: 300px; height: 300px; bottom: 15%; right: 20%; animation-delay: 0.8s; }
+  .ring:nth-child(5) { width: 500px; height: 500px; bottom: 5%; right: 10%; animation-delay: 2.2s; }
+  @keyframes expand {
+    0%,100%  { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.04); opacity: 0.7; }
+  }
+
+  /* Grain texture */
+  .hero-grain {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.35;
+  }
+
+  /* Coffee swirl */
+  .swirl {
+    position: absolute; right: 8%; top: 50%; transform: translateY(-50%);
+    width: 340px; height: 340px; opacity: 0.07;
+  }
+  .swirl svg { width: 100%; height: 100%; animation: swirlRotate 30s linear infinite; }
+  @keyframes swirlRotate { to { transform: rotate(360deg); } }
+
+  .hero-content {
+    position: relative; z-index: 2;
+    text-align: center;
+    animation: heroEnter 1.2s cubic-bezier(0.22, 1, 0.36, 1) 2.8s both;
+  }
+  @keyframes heroEnter {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-eyebrow {
+    font-size: 0.7rem; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 20px; font-weight: 500;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 9vw, 7rem);
+    font-weight: 300; line-height: 0.95;
+    color: var(--cream); margin-bottom: 8px;
+  }
+  .hero-title em { font-style: italic; color: var(--gold); }
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-weight: 300; color: rgba(245,240,232,0.6);
+    letter-spacing: 0.08em; margin-top: 18px; margin-bottom: 40px;
+  }
+  .hero-cta {
+    display: inline-flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+  }
+  .btn-primary {
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.18em;
+    text-transform: uppercase; text-decoration: none;
+    padding: 14px 36px; background: var(--caramel); color: white;
+    border: none; cursor: pointer; transition: all 0.25s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .btn-primary:hover { background: var(--gold); transform: translateY(-2px); }
+  .btn-outline {
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.18em;
+    text-transform: uppercase; text-decoration: none;
+    padding: 14px 36px; background: transparent;
+    color: var(--cream); border: 1px solid rgba(245,240,232,0.35);
+    cursor: pointer; transition: all 0.25s;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  .scroll-hint {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    z-index: 3; animation: heroEnter 1s ease 3.5s both;
+  }
+  .scroll-hint span { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(245,240,232,0.4); }
+  .scroll-arrow { width: 1px; height: 40px; background: linear-gradient(to bottom, transparent, var(--caramel)); animation: scrollPulse 2s ease-in-out infinite; }
+  @keyframes scrollPulse { 0%,100%{opacity:0.4;transform:scaleY(0.7)} 50%{opacity:1;transform:scaleY(1)} }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 100px 40px; }
+  .container { max-width: 1160px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--caramel); font-weight: 500; margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 300; line-height: 1.15; color: var(--espresso);
+  }
+  .section-title em { font-style: italic; color: var(--caramel); }
+  .divider {
+    width: 60px; height: 1px; background: var(--caramel);
+    margin: 24px 0; opacity: 0.5;
+  }
+
+  /* fade-in on scroll */
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── INTRO ─── */
+  #intro { background: var(--foam); }
+  .intro-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .intro-visual {
+    position: relative; height: 480px;
+  }
+  .intro-box {
+    position: absolute; background: var(--espresso);
+    border-radius: 2px;
+  }
+  .intro-box-main {
+    inset: 0; right: 40px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .coffee-icon-big svg { width: 200px; opacity: 0.1; }
+  .intro-box-accent {
+    width: 120px; height: 120px;
+    bottom: -20px; right: -10px;
+    background: var(--caramel);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .accent-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem; font-weight: 300;
+    color: white; line-height: 1;
+    text-align: center;
+  }
+  .accent-num small { display: block; font-size: 0.65rem; letter-spacing: 0.2em; font-family: 'DM Sans', sans-serif; opacity: 0.8; }
+  .intro-text p {
+    font-size: 1.05rem; line-height: 1.85; color: var(--mocha);
+    margin-bottom: 20px; font-weight: 300;
+  }
+  .info-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .chip {
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 7px 16px; border: 1px solid rgba(61,35,20,0.2);
+    color: var(--mocha); border-radius: 2px; white-space: nowrap;
+  }
+
+  /* ─── VÝHODY / VORTEILE / ADVANTAGES ─── */
+  #advantages { background: var(--espresso); }
+  #advantages .section-title { color: var(--cream); }
+  #advantages .divider { background: var(--gold); }
+  .advantages-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    margin-top: 60px;
+  }
+  .adv-card {
+    background: rgba(255,255,255,0.03);
+    padding: 48px 36px;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .adv-card::before {
+    content: ''; position: absolute;
+    bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--caramel); transform: scaleX(0);
+    transition: transform 0.35s ease; transform-origin: left;
+  }
+  .adv-card:hover { background: rgba(196,133,42,0.06); }
+  .adv-card:hover::before { transform: scaleX(1); }
+  .adv-icon { font-size: 2rem; margin-bottom: 20px; }
+  .adv-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 400;
+    color: var(--cream); margin-bottom: 12px;
+  }
+  .adv-desc { font-size: 0.9rem; line-height: 1.75; color: rgba(245,240,232,0.55); font-weight: 300; }
+
+  /* ─── SERVICES ─── */
+  #services { background: var(--cream); }
+  .services-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 60px;
+  }
+  .service-item {
+    display: flex; gap: 28px; align-items: flex-start;
+    padding: 36px; background: var(--foam);
+    border: 1px solid rgba(61,35,20,0.08);
+    transition: box-shadow 0.3s, transform 0.3s;
+  }
+  .service-item:hover {
+    box-shadow: 0 12px 40px rgba(61,35,20,0.1);
+    transform: translateY(-3px);
+  }
+  .service-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem; font-weight: 300;
+    color: var(--caramel); line-height: 1; flex-shrink: 0;
+    opacity: 0.45;
+  }
+  .service-body h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem; font-weight: 400;
+    color: var(--espresso); margin-bottom: 8px;
+  }
+  .service-body p { font-size: 0.88rem; line-height: 1.75; color: var(--mocha); font-weight: 300; }
+
+  /* ─── MENU / ASSORTMENT ─── */
+  #menu { background: var(--espresso); position: relative; overflow: hidden; }
+  #menu::before {
+    content: 'MENU'; position: absolute;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18vw; font-weight: 300;
+    color: rgba(255,255,255,0.025);
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    white-space: nowrap; pointer-events: none;
+  }
+  #menu .section-title { color: var(--cream); }
+  #menu .divider { background: var(--gold); }
+  .menu-tabs {
+    display: flex; gap: 0; margin: 48px 0 40px; border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .menu-tab {
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    font-weight: 500; color: rgba(245,240,232,0.45);
+    padding: 12px 28px; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    background: none; border-top: none; border-left: none; border-right: none;
+    transition: color 0.25s, border-color 0.25s;
+  }
+  .menu-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .menu-tab:hover:not(.active) { color: var(--cream); }
+  .menu-panel { display: none; }
+  .menu-panel.active { display: block; }
+  .menu-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px;
+  }
+  .menu-item {
+    padding: 22px 28px;
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px;
+    transition: background 0.2s;
+  }
+  .menu-item:hover { background: rgba(196,133,42,0.06); }
+  .menu-item-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; color: var(--cream); font-weight: 400;
+  }
+  .menu-item-desc { font-size: 0.8rem; color: rgba(245,240,232,0.45); margin-top: 3px; font-weight: 300; }
+  .menu-item-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; color: var(--gold); white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ─── OPENING HOURS ─── */
+  #hours { background: var(--foam); }
+  .hours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 48px; }
+  .hours-table { width: 100%; border-collapse: collapse; }
+  .hours-table tr { border-bottom: 1px solid rgba(61,35,20,0.07); }
+  .hours-table td { padding: 13px 0; font-size: 0.9rem; color: var(--mocha); }
+  .hours-table td:last-child { text-align: right; font-weight: 500; }
+  .hours-table tr.today td { color: var(--caramel); font-weight: 500; }
+  .contact-block { }
+  .contact-item { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
+  .contact-icon { font-size: 1.2rem; margin-top: 2px; flex-shrink: 0; }
+  .contact-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--caramel); margin-bottom: 4px; }
+  .contact-value { font-size: 0.95rem; color: var(--espresso); }
+  .contact-value a { color: var(--espresso); text-decoration: none; }
+  .contact-value a:hover { color: var(--caramel); }
+
+  /* ─── MAP ─── */
+  #map-section { background: var(--espresso); padding: 0; }
+  .map-wrap {
+    position: relative; width: 100%; height: 480px;
+  }
+  .map-wrap iframe {
+    width: 100%; height: 100%; border: none; display: block;
+    filter: grayscale(30%) contrast(1.05);
+  }
+  .map-overlay {
+    position: absolute; top: 40px; left: 40px;
+    background: var(--espresso); padding: 28px 32px;
+    max-width: 280px;
+  }
+  .map-overlay h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; color: var(--cream); margin-bottom: 8px;
+  }
+  .map-overlay p { font-size: 0.85rem; color: rgba(245,240,232,0.6); line-height: 1.6; }
+  .map-overlay a {
+    display: inline-block; margin-top: 16px;
+    font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); text-decoration: none;
+  }
+  .map-overlay a:hover { color: var(--caramel); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--ink); padding: 48px 40px;
+    display: flex; flex-wrap: wrap; gap: 24px;
+    align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; color: var(--cream); font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+  .footer-logo span { color: var(--gold); }
+  .footer-copy { font-size: 0.75rem; color: rgba(245,240,232,0.3); }
+  .footer-social { display: flex; gap: 16px; }
+  .footer-social a {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(245,240,232,0.45); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-social a:hover { color: var(--gold); }
+
+  /* ─── MOBILE NAV ─── */
+  .mobile-menu {
+    position: fixed; inset: 0; z-index: 90;
+    background: var(--espresso);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 32px;
+    transform: translateX(100%); transition: transform 0.4s ease;
+  }
+  .mobile-menu.open { transform: translateX(0); }
+  .mobile-menu a {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 300; color: var(--cream);
+    text-decoration: none; letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .mobile-menu a:hover { color: var(--gold); }
+  .mobile-lang {
+    display: flex; gap: 10px; margin-top: 8px;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    nav.scrolled { padding: 12px 24px; }
+    .nav-links { display: none; }
+    .burger { display: flex; }
+    section { padding: 70px 24px; }
+    .intro-grid { grid-template-columns: 1fr; gap: 40px; }
+    .intro-visual { height: 280px; }
+    .advantages-grid { grid-template-columns: 1fr; gap: 2px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .hours-grid { grid-template-columns: 1fr; gap: 40px; }
+    .map-overlay { display: none; }
+    footer { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .swirl { display: none; }
+    .hero-title { font-size: clamp(3rem,12vw,5rem); }
+  }
+  @media (max-width: 480px) {
+    .advantages-grid { gap: 0; }
+    .menu-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .menu-tab { white-space: nowrap; padding: 10px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-cup">
+    <svg viewBox="0 0 60 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 15h50l-6 28H11L5 15z" fill="none" stroke="#C4852A" stroke-width="2"/>
+      <path d="M43 20c4 0 8 2 8 7s-4 7-8 7" stroke="#C4852A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="30" cy="15" rx="25" ry="4" fill="#C4852A" opacity="0.3"/>
+    </svg>
+    <div class="steam-line"></div>
+    <div class="steam-line"></div>
+    <div class="steam-line"></div>
+  </div>
+  <div class="loader-text">HansPaul Kafe</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+</div>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#intro" onclick="closeMobile()" data-i18n="nav_about">O nás</a>
+  <a href="#advantages" onclick="closeMobile()" data-i18n="nav_why">Výhody</a>
+  <a href="#services" onclick="closeMobile()" data-i18n="nav_services">Služby</a>
+  <a href="#menu" onclick="closeMobile()" data-i18n="nav_menu">Menu</a>
+  <a href="#hours" onclick="closeMobile()" data-i18n="nav_contact">Kontakt</a>
+  <div class="mobile-lang">
+    <button class="lang-btn active" onclick="setLang('cs');closeMobile()">CS</button>
+    <button class="lang-btn" onclick="setLang('en');closeMobile()">EN</button>
+    <button class="lang-btn" onclick="setLang('de');closeMobile()">DE</button>
+    <button class="lang-btn" onclick="setLang('ru');closeMobile()">RU</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-logo" href="#hero">Hans<span>Paul</span> Kafe</a>
+  <div class="nav-links">
+    <a href="#intro" data-i18n="nav_about">O nás</a>
+    <a href="#advantages" data-i18n="nav_why">Výhody</a>
+    <a href="#services" data-i18n="nav_services">Služby</a>
+    <a href="#menu" data-i18n="nav_menu">Menu</a>
+    <a href="#hours" data-i18n="nav_contact">Kontakt</a>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('cs')">CS</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('ru')">RU</button>
+    </div>
+  </div>
+  <button class="burger" id="burgerBtn" onclick="toggleMobile()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="hero-grain"></div>
+    <div class="swirl">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100,10 C150,10 190,50 190,100 C190,150 150,190 100,190 C50,190 10,150 10,100 C10,50 50,10 100,10" fill="none" stroke="#C4852A" stroke-width="1" stroke-dasharray="8,4"/>
+        <path d="M100,30 C140,30 170,65 170,100 C170,135 140,170 100,170 C60,170 30,135 30,100 C30,65 60,30 100,30" fill="none" stroke="#C4852A" stroke-width="0.7" stroke-dasharray="6,6" opacity="0.6"/>
+        <path d="M100,50 C130,50 150,72 150,100 C150,128 130,150 100,150 C70,150 50,128 50,100 C50,72 70,50 100,50" fill="none" stroke="#C4852A" stroke-width="0.5" stroke-dasharray="4,8" opacity="0.3"/>
+      </svg>
+    </div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Praha · Dejvice · Od roku 2020</p>
+    <h1 class="hero-title">Hans<em>Paul</em><br>Kafe</h1>
+    <p class="hero-sub" data-i18n="hero_sub">Útulná kavárna v srdci Hanspaulky</p>
+    <div class="hero-cta">
+      <a href="#menu" class="btn-primary" data-i18n="hero_btn1">Prohlédnout menu</a>
+      <a href="#hours" class="btn-outline" data-i18n="hero_btn2">Kde nás najdete</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span data-i18n="scroll">Scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="container">
+    <div class="intro-grid">
+      <div class="intro-visual reveal">
+        <div class="intro-box intro-box-main">
+          <div class="coffee-icon-big">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 80h160l-16 80H36L20 80z" stroke="#C4852A" stroke-width="3"/>
+              <path d="M160 100c12 0 20 8 20 20s-8 20-20 20" stroke="#C4852A" stroke-width="3" stroke-linecap="round"/>
+              <ellipse cx="100" cy="80" rx="80" ry="16" stroke="#C4852A" stroke-width="2" opacity="0.5"/>
+              <path d="M70 50 Q80 30 70 15" stroke="#C4852A" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M100 45 Q110 25 100 10" stroke="#C4852A" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M130 50 Q140 30 130 15" stroke="#C4852A" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="intro-box intro-box-accent">
+          <div class="accent-num">★4.8<small data-i18n="rating">hodnocení</small></div>
+        </div>
+      </div>
+      <div class="intro-text reveal">
+        <p class="section-label" data-i18n="intro_label">O kavárně</p>
+        <h2 class="section-title" data-i18n="intro_title">Místo, kde<br><em>čas plyne</em> pomalu</h2>
+        <div class="divider"></div>
+        <p data-i18n="intro_p1">HansPaul Kafe je útulná rodinná kavárna v klidné vilové čtvrti Hanspaulka, Praha 6 – Dejvice. Vítáme vás každý den s čerstvou kávou, domácími moučníky a přátelskou atmosférou.</p>
+        <p data-i18n="intro_p2">Používáme prémiovou zrnkovou kávu a čerstvé ingredience. Naše domácí dorty a zákusky jsou připravovány s láskou každé ráno — přijďte si pochutnat na něčem skutečně poctivém.</p>
+        <div class="info-chips">
+          <span class="chip" data-i18n="chip1">☕ Espresso & Specialty</span>
+          <span class="chip" data-i18n="chip2">🎂 Domácí moučníky</span>
+          <span class="chip" data-i18n="chip3">🌿 Snídaně & Svačiny</span>
+          <span class="chip" data-i18n="chip4">📍 Praha 6, Dejvice</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADVANTAGES -->
+<section id="advantages">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label" data-i18n="adv_label">Proč si vybrat nás</p>
+      <h2 class="section-title" data-i18n="adv_title">Co nás <em>odlišuje</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="advantages-grid">
+      <div class="adv-card reveal">
+        <div class="adv-icon">☕</div>
+        <h3 class="adv-title" data-i18n="adv1_title">Prémiová káva</h3>
+        <p class="adv-desc" data-i18n="adv1_desc">Pečlivě vybraná zrnková káva od nejlepších pražíren. Každý šálek je malé umění — od espressa po flat white.</p>
+      </div>
+      <div class="adv-card reveal">
+        <div class="adv-icon">🎂</div>
+        <h3 class="adv-title" data-i18n="adv2_title">Domácí pečivo</h3>
+        <p class="adv-desc" data-i18n="adv2_desc">Dorty, koláče a zákusky připravované každý den z poctivých farmářských surovin. Žádné konzervanty, jen chuť.</p>
+      </div>
+      <div class="adv-card reveal">
+        <div class="adv-icon">🏡</div>
+        <h3 class="adv-title" data-i18n="adv3_title">Útulná atmosféra</h3>
+        <p class="adv-desc" data-i18n="adv3_desc">Malá, rodinná kavárna v tiché vilové čtvrti. Perfektní únik od shonu města — přijďte si odpočinout.</p>
+      </div>
+      <div class="adv-card reveal">
+        <div class="adv-icon">⏰</div>
+        <h3 class="adv-title" data-i18n="adv4_title">Otevřeno každý den</h3>
+        <p class="adv-desc" data-i18n="adv4_desc">Po–Pá od 7:30, víkendy od 10:00. Jsme tu, když potřebujete ranní kávu nebo odpolední pauzu.</p>
+      </div>
+      <div class="adv-card reveal">
+        <div class="adv-icon">⭐</div>
+        <h3 class="adv-title" data-i18n="adv5_title">Skvělé recenze</h3>
+        <p class="adv-desc" data-i18n="adv5_desc">Hodnocení 4.8/5 — hosté oceňují přátelský personál, skvělou kávu a domácí pochoutky.</p>
+      </div>
+      <div class="adv-card reveal">
+        <div class="adv-icon">🌐</div>
+        <h3 class="adv-title" data-i18n="adv6_title">4 jazyky</h3>
+        <p class="adv-desc" data-i18n="adv6_desc">Mluvíme česky, anglicky, německy a rusky. Cítíte se vítáni odkudkoli — srdečně vás přijmeme.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label" data-i18n="srv_label">Co nabízíme</p>
+      <h2 class="section-title" data-i18n="srv_title">Naše <em>služby</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="services-grid">
+      <div class="service-item reveal">
+        <div class="service-num">01</div>
+        <div class="service-body">
+          <h3 data-i18n="srv1_title">Kavárna & Café</h3>
+          <p data-i18n="srv1_desc">Espresso, cappuccino, flat white, cold brew, čaje a další nápoje. Vše ze špičkových surovin s péčí a přesností.</p>
+        </div>
+      </div>
+      <div class="service-item reveal">
+        <div class="service-num">02</div>
+        <div class="service-body">
+          <h3 data-i18n="srv2_title">Snídaně & Svačiny</h3>
+          <p data-i18n="srv2_desc">Čerstvé toasty, croissanty, jogurty, müsli a lehké svačiny pro dokonalý start dne nebo odpolední pauzu.</p>
+        </div>
+      </div>
+      <div class="service-item reveal">
+        <div class="service-num">03</div>
+        <div class="service-body">
+          <h3 data-i18n="srv3_title">Narozeninové dorty</h3>
+          <p data-i18n="srv3_desc">Zakázkové narozeninové dorty a dezerty připravované s láskou z farmářských ingrediencí. Objednávky na míru.</p>
+        </div>
+      </div>
+      <div class="service-item reveal">
+        <div class="service-num">04</div>
+        <div class="service-body">
+          <h3 data-i18n="srv4_title">Take Away</h3>
+          <p data-i18n="srv4_desc">Káva a pochoutky s sebou — ideální pro ty, kdo spěchají. Vše zabalíme pečlivě a s úsměvem.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label" data-i18n="menu_label">Náš výběr</p>
+      <h2 class="section-title" data-i18n="menu_title">Nápojový <em>lístek</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="menu-tabs">
+      <button class="menu-tab active" onclick="showTab('coffee')" data-i18n="tab_coffee">☕ Káva</button>
+      <button class="menu-tab" onclick="showTab('nonalco')" data-i18n="tab_nonalco">🍵 Nápoje</button>
+      <button class="menu-tab" onclick="showTab('food')" data-i18n="tab_food">🎂 Jídlo</button>
+      <button class="menu-tab" onclick="showTab('sweet')" data-i18n="tab_sweet">🍰 Moučníky</button>
+    </div>
+
+    <div class="menu-panel active" id="tab-coffee">
+      <div class="menu-grid">
+        <div class="menu-item reveal"><div><div class="menu-item-name">Espresso</div><div class="menu-item-desc" data-i18n="espresso_desc">Silné, čisté, dokonalé</div></div><div class="menu-item-price">55 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Cappuccino</div><div class="menu-item-desc" data-i18n="capp_desc">Espresso s jemnou mléčnou pěnou</div></div><div class="menu-item-price">75 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Flat White</div><div class="menu-item-desc" data-i18n="fw_desc">Dvojité espresso s hedvábným mlékem</div></div><div class="menu-item-price">80 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Latte</div><div class="menu-item-desc" data-i18n="latte_desc">Velký šálek s jemným mlékem</div></div><div class="menu-item-price">85 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Cold Brew</div><div class="menu-item-desc" data-i18n="cb_desc">24h louhovaná studená káva</div></div><div class="menu-item-price">90 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Affogato</div><div class="menu-item-desc" data-i18n="aff_desc">Espresso s vanilkovou zmrzlinou</div></div><div class="menu-item-price">95 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Svařák</div><div class="menu-item-desc" data-i18n="svarek_desc">Domácí svařené víno se kořením</div></div><div class="menu-item-price">75 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Vídeňská káva</div><div class="menu-item-desc" data-i18n="wien_desc">Espresso se šlehačkou</div></div><div class="menu-item-price">85 Kč</div></div>
+      </div>
+    </div>
+
+    <div class="menu-panel" id="tab-nonalco">
+      <div class="menu-grid">
+        <div class="menu-item reveal"><div><div class="menu-item-name">Čaj výběrový</div><div class="menu-item-desc" data-i18n="tea_desc">Bylinkové, ovocné, zelené, černé</div></div><div class="menu-item-price">55 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Horká čokoláda</div><div class="menu-item-desc" data-i18n="choc_desc">Belgická čokoláda s mlékem</div></div><div class="menu-item-price">75 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Fresh džus</div><div class="menu-item-desc" data-i18n="juice_desc">Čerstvě mačkaný pomeranč / jablko</div></div><div class="menu-item-price">75 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Limonáda</div><div class="menu-item-desc" data-i18n="limo_desc">Domácí citronová nebo malinová</div></div><div class="menu-item-price">65 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Voda</div><div class="menu-item-desc" data-i18n="water_desc">Perlivá nebo neperlivá 0.5L</div></div><div class="menu-item-price">40 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Matcha Latte</div><div class="menu-item-desc" data-i18n="matcha_desc">Japonský zelený čaj s mlékem</div></div><div class="menu-item-price">90 Kč</div></div>
+      </div>
+    </div>
+
+    <div class="menu-panel" id="tab-food">
+      <div class="menu-grid">
+        <div class="menu-item reveal"><div><div class="menu-item-name">Toast se šunkou</div><div class="menu-item-desc" data-i18n="toast_desc">Čerstvý toast, šunka, sýr, zelenina</div></div><div class="menu-item-price">120 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Croissant</div><div class="menu-item-desc" data-i18n="crois_desc">Máslový croissant, čerstvý každé ráno</div></div><div class="menu-item-price">55 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Jogurt s granolou</div><div class="menu-item-desc" data-i18n="yogurt_desc">Řecký jogurt, granola, sezonní ovoce</div></div><div class="menu-item-price">110 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Avokádo toast</div><div class="menu-item-desc" data-i18n="avo_desc">Celozrnný toast, avokádo, vejce</div></div><div class="menu-item-price">145 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Müsli</div><div class="menu-item-desc" data-i18n="muesli_desc">Domácí müsli s mlékem nebo jogurtem</div></div><div class="menu-item-price">90 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Bagel</div><div class="menu-item-desc" data-i18n="bagel_desc">Bagel s lososem nebo sýrem a zeleninou</div></div><div class="menu-item-price">135 Kč</div></div>
+      </div>
+    </div>
+
+    <div class="menu-panel" id="tab-sweet">
+      <div class="menu-grid">
+        <div class="menu-item reveal"><div><div class="menu-item-name">Domácí dort dne</div><div class="menu-item-desc" data-i18n="cake_desc">Každý den jiný — ptejte se personálu</div></div><div class="menu-item-price">75 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Cheesecake</div><div class="menu-item-desc" data-i18n="cheese_desc">New York style, sezonní příchuť</div></div><div class="menu-item-price">85 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Tiramisu</div><div class="menu-item-desc" data-i18n="tira_desc">Klasické italské tiramisu</div></div><div class="menu-item-price">90 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Brownie</div><div class="menu-item-desc" data-i18n="brownie_desc">Čokoládové brownie se zmrzlinou</div></div><div class="menu-item-price">80 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Makronky</div><div class="menu-item-desc" data-i18n="mac_desc">Francouzské makronky, 2 ks</div></div><div class="menu-item-price">60 Kč</div></div>
+        <div class="menu-item reveal"><div><div class="menu-item-name">Narozeninový dort</div><div class="menu-item-desc" data-i18n="bday_desc">Na objednávku — kontaktujte nás</div></div><div class="menu-item-price" data-i18n="price_request">Na dotaz</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOURS & CONTACT -->
+<section id="hours">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label" data-i18n="hours_label">Návštěva</p>
+      <h2 class="section-title" data-i18n="hours_title">Otevírací doby<br>& <em>Kontakt</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="hours-grid">
+      <div class="reveal">
+        <table class="hours-table">
+          <tr><td data-i18n="mon">Pondělí</td><td>7:30 – 18:00</td></tr>
+          <tr><td data-i18n="tue">Úterý</td><td>7:30 – 18:00</td></tr>
+          <tr><td data-i18n="wed">Středa</td><td>7:30 – 18:00</td></tr>
+          <tr class="today"><td data-i18n="thu">Čtvrtek ⟵ <span data-i18n="today">dnes</span></td><td>7:30 – 18:00</td></tr>
+          <tr><td data-i18n="fri">Pátek</td><td>7:30 – 18:00</td></tr>
+          <tr><td data-i18n="sat">Sobota</td><td>10:00 – 18:00</td></tr>
+          <tr><td data-i18n="sun">Neděle</td><td>10:00 – 18:00</td></tr>
+        </table>
+      </div>
+      <div class="contact-block reveal">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-label" data-i18n="addr_label">Adresa</div>
+            <div class="contact-value">Na Špitálce 1927/9<br>160 00 Praha 6, Dejvice</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-label" data-i18n="phone_label">Telefon</div>
+            <div class="contact-value"><a href="tel:+420608969417">+420 608 969 417</a></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <div class="contact-label" data-i18n="email_label">Email</div>
+            <div class="contact-value"><a href="mailto:kafe@hanspaulkafe.cz">kafe@hanspaulkafe.cz</a></div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📱</div>
+          <div>
+            <div class="contact-label">Facebook</div>
+            <div class="contact-value"><a href="https://www.facebook.com/Hanspaulkafe/" target="_blank">facebook.com/Hanspaulkafe</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<div id="map-section">
+  <div class="map-wrap">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2558.6!2d14.3763!3d50.1104!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470b95cc32c43c87%3A0x9d12344a95a60e6!2sHanspaul%20Kafe!5e0!3m2!1scs!2scz!4v1714000000000!5m2!1scs!2scz"
+      allowfullscreen="" loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="HansPaul Kafe mapa">
+    </iframe>
+    <div class="map-overlay">
+      <h4>HansPaul Kafe</h4>
+      <p>Na Špitálce 1927/9<br>Praha 6 – Dejvice<br>160 00 Praha</p>
+      <a href="https://goo.gl/maps/hanspaulkafe" target="_blank" data-i18n="open_maps">Otevřít v Google Maps →</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Hans<span>Paul</span> Kafe</div>
+  <div class="footer-copy" data-i18n="footer_copy">© 2024 HansPaul Kafe · Praha 6, Dejvice</div>
+  <div class="footer-social">
+    <a href="https://www.facebook.com/Hanspaulkafe/" target="_blank">Facebook</a>
+    <a href="tel:+420608969417">+420 608 969 417</a>
+  </div>
+</footer>
+
+<script>
+// ─── LOADER ───
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const l = document.getElementById('loader');
+    l.classList.add('hide');
+    setTimeout(() => l.remove(), 700);
+  }, 2600);
+});
+
+// ─── NAV scroll ───
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ─── BURGER ───
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMobile() {
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// ─── TABS ───
+function showTab(id) {
+  document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  // re-trigger reveals in new panel
+  setTimeout(observeReveals, 50);
+}
+
+// ─── REVEAL on scroll ───
+function observeReveals() {
+  const reveals = document.querySelectorAll('.reveal:not(.visible)');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => io.observe(r));
+}
+observeReveals();
+
+// ─── I18N ───
+const translations = {
+  cs: {
+    nav_about:'O nás', nav_why:'Výhody', nav_services:'Služby', nav_menu:'Menu', nav_contact:'Kontakt',
+    hero_eyebrow:'Praha · Dejvice · Od roku 2020',
+    hero_sub:'Útulná kavárna v srdci Hanspaulky',
+    hero_btn1:'Prohlédnout menu', hero_btn2:'Kde nás najdete', scroll:'Scroll',
+    intro_label:'O kavárně',
+    intro_title:'Místo, kde<br><em>čas plyne</em> pomalu',
+    intro_p1:'HansPaul Kafe je útulná rodinná kavárna v klidné vilové čtvrti Hanspaulka, Praha 6 – Dejvice. Vítáme vás každý den s čerstvou kávou, domácími moučníky a přátelskou atmosférou.',
+    intro_p2:'Používáme prémiovou zrnkovou kávu a čerstvé ingredience. Naše domácí dorty a zákusky jsou připravovány s láskou každé ráno — přijďte si pochutnat na něčem skutečně poctivém.',
+    chip1:'☕ Espresso & Specialty', chip2:'🎂 Domácí moučníky', chip3:'🌿 Snídaně & Svačiny', chip4:'📍 Praha 6, Dejvice',
+    rating:'hodnocení',
+    adv_label:'Proč si vybrat nás', adv_title:'Co nás <em>odlišuje</em>',
+    adv1_title:'Prémiová káva', adv1_desc:'Pečlivě vybraná zrnková káva od nejlepších pražíren. Každý šálek je malé umění — od espressa po flat white.',
+    adv2_title:'Domácí pečivo', adv2_desc:'Dorty, koláče a zákusky připravované každý den z poctivých farmářských surovin. Žádné konzervanty, jen chuť.',
+    adv3_title:'Útulná atmosféra', adv3_desc:'Malá, rodinná kavárna v tiché vilové čtvrti. Perfektní únik od shonu města — přijďte si odpočinout.',
+    adv4_title:'Otevřeno každý den', adv4_desc:'Po–Pá od 7:30, víkendy od 10:00. Jsme tu, když potřebujete ranní kávu nebo odpolední pauzu.',
+    adv5_title:'Skvělé recenze', adv5_desc:'Hodnocení 4.8/5 — hosté oceňují přátelský personál, skvělou kávu a domácí pochoutky.',
+    adv6_title:'4 jazyky', adv6_desc:'Mluvíme česky, anglicky, německy a rusky. Cítíte se vítáni odkudkoli — srdečně vás přijmeme.',
+    srv_label:'Co nabízíme', srv_title:'Naše <em>služby</em>',
+    srv1_title:'Kavárna & Café', srv1_desc:'Espresso, cappuccino, flat white, cold brew, čaje a další nápoje. Vše ze špičkových surovin.',
+    srv2_title:'Snídaně & Svačiny', srv2_desc:'Čerstvé toasty, croissanty, jogurty, müsli a lehké svačiny pro dokonalý start dne.',
+    srv3_title:'Narozeninové dorty', srv3_desc:'Zakázkové narozeninové dorty a dezerty připravované s láskou z farmářských ingrediencí.',
+    srv4_title:'Take Away', srv4_desc:'Káva a pochoutky s sebou — ideální pro ty, kdo spěchají. Vše zabalíme pečlivě a s úsměvem.',
+    menu_label:'Náš výběr', menu_title:'Nápojový <em>lístek</em>',
+    tab_coffee:'☕ Káva', tab_nonalco:'🍵 Nápoje', tab_food:'🎂 Jídlo', tab_sweet:'🍰 Moučníky',
+    espresso_desc:'Silné, čisté, dokonalé', capp_desc:'Espresso s jemnou mléčnou pěnou',
+    fw_desc:'Dvojité espresso s hedvábným mlékem', latte_desc:'Velký šálek s jemným mlékem',
+    cb_desc:'24h louhovaná studená káva', aff_desc:'Espresso s vanilkovou zmrzlinou',
+    svarek_desc:'Domácí svařené víno se kořením', wien_desc:'Espresso se šlehačkou',
+    tea_desc:'Bylinkové, ovocné, zelené, černé', choc_desc:'Belgická čokoláda s mlékem',
+    juice_desc:'Čerstvě mačkaný pomeranč / jablko', limo_desc:'Domácí citronová nebo malinová',
+    water_desc:'Perlivá nebo neperlivá 0.5L', matcha_desc:'Japonský zelený čaj s mlékem',
+    toast_desc:'Čerstvý toast, šunka, sýr, zelenina', crois_desc:'Máslový croissant, čerstvý každé ráno',
+    yogurt_desc:'Řecký jogurt, granola, sezonní ovoce', avo_desc:'Celozrnný toast, avokádo, vejce',
+    muesli_desc:'Domácí müsli s mlékem nebo jogurtem', bagel_desc:'Bagel s lososem nebo sýrem a zeleninou',
+    cake_desc:'Každý den jiný — ptejte se personálu', cheese_desc:'New York style, sezonní příchuť',
+    tira_desc:'Klasické italské tiramisu', brownie_desc:'Čokoládové brownie se zmrzlinou',
+    mac_desc:'Francouzské makronky, 2 ks', bday_desc:'Na objednávku — kontaktujte nás',
+    price_request:'Na dotaz',
+    hours_label:'Návštěva', hours_title:'Otevírací doby<br>& <em>Kontakt</em>',
+    mon:'Pondělí', tue:'Úterý', wed:'Středa', thu:'Čtvrtek ⟵', today:'dnes',
+    fri:'Pátek', sat:'Sobota', sun:'Neděle',
+    addr_label:'Adresa', phone_label:'Telefon', email_label:'Email',
+    open_maps:'Otevřít v Google Maps →',
+    footer_copy:'© 2024 HansPaul Kafe · Praha 6, Dejvice'
+  },
+  en: {
+    nav_about:'About', nav_why:'Why Us', nav_services:'Services', nav_menu:'Menu', nav_contact:'Contact',
+    hero_eyebrow:'Prague · Dejvice · Since 2020',
+    hero_sub:'A cozy café in the heart of Hanspaulka',
+    hero_btn1:'Browse menu', hero_btn2:'Find us', scroll:'Scroll',
+    intro_label:'About us',
+    intro_title:'A place where<br><em>time slows</em> down',
+    intro_p1:'HansPaul Kafe is a cozy family café in the quiet residential district of Hanspaulka, Prague 6 – Dejvice. We welcome you every day with fresh coffee, homemade pastries and a friendly atmosphere.',
+    intro_p2:'We use premium whole-bean coffee and fresh ingredients. Our homemade cakes and desserts are made with love each morning — come and enjoy something truly honest.',
+    chip1:'☕ Espresso & Specialty', chip2:'🎂 Homemade pastries', chip3:'🌿 Breakfast & Snacks', chip4:'📍 Prague 6, Dejvice',
+    rating:'rating',
+    adv_label:'Why choose us', adv_title:'What <em>sets us apart</em>',
+    adv1_title:'Premium Coffee', adv1_desc:'Carefully selected whole-bean coffee from the finest roasters. Every cup is a small work of art — from espresso to flat white.',
+    adv2_title:'Homemade Pastries', adv2_desc:'Cakes, pies and desserts made daily from honest farm ingredients. No preservatives — just pure taste.',
+    adv3_title:'Cozy Atmosphere', adv3_desc:'A small family café in a quiet residential neighbourhood. The perfect escape from the city bustle — come and relax.',
+    adv4_title:'Open Every Day', adv4_desc:'Mon–Fri from 7:30, weekends from 10:00. We\'re here when you need a morning coffee or an afternoon break.',
+    adv5_title:'Great Reviews', adv5_desc:'Rated 4.8/5 — guests love our friendly staff, great coffee and homemade treats.',
+    adv6_title:'4 Languages', adv6_desc:'We speak Czech, English, German and Russian. Feel welcome from anywhere — we\'ll greet you warmly.',
+    srv_label:'What we offer', srv_title:'Our <em>Services</em>',
+    srv1_title:'Café & Coffee Bar', srv1_desc:'Espresso, cappuccino, flat white, cold brew, teas and more. All from top-quality ingredients.',
+    srv2_title:'Breakfast & Snacks', srv2_desc:'Fresh toasts, croissants, yoghurts, granola and light snacks for the perfect start to the day.',
+    srv3_title:'Birthday Cakes', srv3_desc:'Custom birthday cakes and desserts made with love from farm-fresh ingredients. Order to specification.',
+    srv4_title:'Take Away', srv4_desc:'Coffee and treats to go — ideal for those in a hurry. We pack everything carefully and with a smile.',
+    menu_label:'Our selection', menu_title:'<em>Drinks</em> menu',
+    tab_coffee:'☕ Coffee', tab_nonalco:'🍵 Drinks', tab_food:'🎂 Food', tab_sweet:'🍰 Pastries',
+    espresso_desc:'Strong, clean, perfect', capp_desc:'Espresso with silky milk foam',
+    fw_desc:'Double espresso with silky milk', latte_desc:'Large cup with gentle milk',
+    cb_desc:'24h cold-steeped coffee', aff_desc:'Espresso with vanilla ice cream',
+    svarek_desc:'Homemade mulled wine with spices', wien_desc:'Espresso with whipped cream',
+    tea_desc:'Herbal, fruit, green, black', choc_desc:'Belgian chocolate with milk',
+    juice_desc:'Freshly squeezed orange / apple', limo_desc:'Homemade lemon or raspberry',
+    water_desc:'Still or sparkling 0.5L', matcha_desc:'Japanese green tea with milk',
+    toast_desc:'Fresh toast, ham, cheese, vegetables', crois_desc:'Buttery croissant, fresh every morning',
+    yogurt_desc:'Greek yoghurt, granola, seasonal fruit', avo_desc:'Wholegrain toast, avocado, egg',
+    muesli_desc:'Homemade granola with milk or yoghurt', bagel_desc:'Bagel with salmon or cheese and vegetables',
+    cake_desc:'Different every day — ask the staff', cheese_desc:'New York style, seasonal flavour',
+    tira_desc:'Classic Italian tiramisu', brownie_desc:'Chocolate brownie with ice cream',
+    mac_desc:'French macarons, set of 2', bday_desc:'Made to order — contact us',
+    price_request:'On request',
+    hours_label:'Visit us', hours_title:'Opening hours<br>& <em>Contact</em>',
+    mon:'Monday', tue:'Tuesday', wed:'Wednesday', thu:'Thursday ⟵', today:'today',
+    fri:'Friday', sat:'Saturday', sun:'Sunday',
+    addr_label:'Address', phone_label:'Phone', email_label:'Email',
+    open_maps:'Open in Google Maps →',
+    footer_copy:'© 2024 HansPaul Kafe · Prague 6, Dejvice'
+  },
+  de: {
+    nav_about:'Über uns', nav_why:'Vorteile', nav_services:'Leistungen', nav_menu:'Speisekarte', nav_contact:'Kontakt',
+    hero_eyebrow:'Prag · Dejvice · Seit 2020',
+    hero_sub:'Ein gemütliches Café im Herzen der Hanspaulka',
+    hero_btn1:'Speisekarte ansehen', hero_btn2:'Uns finden', scroll:'Scroll',
+    intro_label:'Über das Café',
+    intro_title:'Ein Ort, an dem<br><em>die Zeit</em> langsamer wird',
+    intro_p1:'HansPaul Kafe ist ein gemütliches Familiencafé im ruhigen Villenviertel Hanspaulka, Prag 6 – Dejvice. Jeden Tag begrüßen wir Sie mit frischem Kaffee, hausgemachten Backwaren und einer freundlichen Atmosphäre.',
+    intro_p2:'Wir verwenden Premium-Bohnenkaffee und frische Zutaten. Unsere hausgemachten Torten und Desserts werden jeden Morgen mit Liebe zubereitet — kommen Sie und genießen Sie etwas wirklich Ehrliches.',
+    chip1:'☕ Espresso & Specialty', chip2:'🎂 Hausgemachtes Gebäck', chip3:'🌿 Frühstück & Snacks', chip4:'📍 Prag 6, Dejvice',
+    rating:'Bewertung',
+    adv_label:'Warum wir', adv_title:'Was uns <em>auszeichnet</em>',
+    adv1_title:'Premium-Kaffee', adv1_desc:'Sorgfältig ausgewählter Bohnenkaffee von den besten Röstern. Jede Tasse ist ein kleines Kunstwerk.',
+    adv2_title:'Hausgemachtes Gebäck', adv2_desc:'Torten und Desserts täglich aus ehrlichen Bauernhofzutaten. Keine Konservierungsstoffe — nur Geschmack.',
+    adv3_title:'Gemütliche Atmosphäre', adv3_desc:'Ein kleines Familiencafé in einer ruhigen Villengegend. Die perfekte Auszeit vom Stadttrubel.',
+    adv4_title:'Täglich geöffnet', adv4_desc:'Mo–Fr ab 7:30, Wochenende ab 10:00. Wir sind da, wenn Sie Ihren Morgenkaffee brauchen.',
+    adv5_title:'Tolle Bewertungen', adv5_desc:'4,8/5 — Gäste schätzen freundliches Personal, großartigen Kaffee und hausgemachte Leckereien.',
+    adv6_title:'4 Sprachen', adv6_desc:'Wir sprechen Tschechisch, Englisch, Deutsch und Russisch. Fühlen Sie sich herzlich willkommen.',
+    srv_label:'Was wir anbieten', srv_title:'Unsere <em>Leistungen</em>',
+    srv1_title:'Café & Kaffeebar', srv1_desc:'Espresso, Cappuccino, Flat White, Cold Brew, Tees und mehr. Alles aus besten Zutaten.',
+    srv2_title:'Frühstück & Snacks', srv2_desc:'Frische Toasts, Croissants, Joghurts, Müsli und leichte Snacks für den perfekten Tagesstart.',
+    srv3_title:'Geburtstagstorten', srv3_desc:'Individuelle Geburtstagstorten und Desserts aus frischen Bauernhofzutaten. Auf Bestellung.',
+    srv4_title:'Take Away', srv4_desc:'Kaffee und Leckereien zum Mitnehmen — ideal für Eilige. Alles sorgfältig verpackt mit einem Lächeln.',
+    menu_label:'Unsere Auswahl', menu_title:'<em>Getränkekarte</em>',
+    tab_coffee:'☕ Kaffee', tab_nonalco:'🍵 Getränke', tab_food:'🎂 Speisen', tab_sweet:'🍰 Gebäck',
+    espresso_desc:'Stark, rein, perfekt', capp_desc:'Espresso mit samtiger Milchschaum',
+    fw_desc:'Doppelter Espresso mit Milch', latte_desc:'Große Tasse mit sanfter Milch',
+    cb_desc:'24h kalt aufgebrühter Kaffee', aff_desc:'Espresso mit Vanilleeis',
+    svarek_desc:'Hausgemachter Glühwein mit Gewürzen', wien_desc:'Espresso mit Schlagsahne',
+    tea_desc:'Kräuter, Frucht, Grün, Schwarz', choc_desc:'Belgische Schokolade mit Milch',
+    juice_desc:'Frisch gepresste Orange / Apfel', limo_desc:'Hausgemachte Zitronen- oder Himbeerlimonade',
+    water_desc:'Still oder Sprudel 0,5L', matcha_desc:'Japanischer grüner Tee mit Milch',
+    toast_desc:'Frischer Toast, Schinken, Käse, Gemüse', crois_desc:'Buttercroissant, jeden Morgen frisch',
+    yogurt_desc:'Griechischer Joghurt, Granola, Saisonobst', avo_desc:'Vollkorntoast, Avocado, Ei',
+    muesli_desc:'Hausmüsli mit Milch oder Joghurt', bagel_desc:'Bagel mit Lachs oder Käse und Gemüse',
+    cake_desc:'Täglich wechselnd — fragen Sie das Personal', cheese_desc:'New Yorker Art, Saisongeschmack',
+    tira_desc:'Klassisches italienisches Tiramisu', brownie_desc:'Schokoladenbrownie mit Eis',
+    mac_desc:'Französische Macarons, 2 Stück', bday_desc:'Auf Bestellung — kontaktieren Sie uns',
+    price_request:'Auf Anfrage',
+    hours_label:'Besuch', hours_title:'Öffnungszeiten<br>& <em>Kontakt</em>',
+    mon:'Montag', tue:'Dienstag', wed:'Mittwoch', thu:'Donnerstag ⟵', today:'heute',
+    fri:'Freitag', sat:'Samstag', sun:'Sonntag',
+    addr_label:'Adresse', phone_label:'Telefon', email_label:'E-Mail',
+    open_maps:'In Google Maps öffnen →',
+    footer_copy:'© 2024 HansPaul Kafe · Prag 6, Dejvice'
+  },
+  ru: {
+    nav_about:'О нас', nav_why:'Преимущества', nav_services:'Услуги', nav_menu:'Меню', nav_contact:'Контакт',
+    hero_eyebrow:'Прага · Дейвице · С 2020 года',
+    hero_sub:'Уютная кафе в сердце Ханспаулки',
+    hero_btn1:'Посмотреть меню', hero_btn2:'Как нас найти', scroll:'Прокрутить',
+    intro_label:'О кафе',
+    intro_title:'Место, где<br><em>время течёт</em> медленнее',
+    intro_p1:'HansPaul Kafe — это уютное семейное кафе в тихом вилловом районе Ханспаулка, Прага 6 – Дейвице. Мы встречаем вас каждый день свежим кофе, домашней выпечкой и тёплой атмосферой.',
+    intro_p2:'Мы используем зерновой кофе премиального качества и свежие ингредиенты. Наши домашние торты и пирожные готовятся с любовью каждое утро — приходите насладиться чем-то по-настоящему вкусным.',
+    chip1:'☕ Эспрессо & Specialty', chip2:'🎂 Домашняя выпечка', chip3:'🌿 Завтраки & Закуски', chip4:'📍 Прага 6, Дейвице',
+    rating:'оценка',
+    adv_label:'Почему мы', adv_title:'Что нас <em>отличает</em>',
+    adv1_title:'Премиальный кофе', adv1_desc:'Тщательно отобранный зерновой кофе от лучших обжарщиков. Каждая чашка — маленькое произведение искусства.',
+    adv2_title:'Домашняя выпечка', adv2_desc:'Торты, пирожные и десерты ежедневно из фермерских продуктов. Никаких консервантов — только вкус.',
+    adv3_title:'Уютная атмосфера', adv3_desc:'Маленькое семейное кафе в тихом вилловом квартале. Идеальное место для отдыха от городской суеты.',
+    adv4_title:'Открыты каждый день', adv4_desc:'Пн–Пт с 7:30, выходные с 10:00. Мы здесь, когда вам нужен утренний кофе или дневной перерыв.',
+    adv5_title:'Отличные отзывы', adv5_desc:'Рейтинг 4.8/5 — гости ценят дружелюбный персонал, отличный кофе и домашние угощения.',
+    adv6_title:'4 языка', adv6_desc:'Мы говорим по-чешски, по-английски, по-немецки и по-русски. Вы будете чувствовать себя желанным гостем.',
+    srv_label:'Что мы предлагаем', srv_title:'Наши <em>услуги</em>',
+    srv1_title:'Кафе & Кофейня', srv1_desc:'Эспрессо, капучино, флэт уайт, колд брю, чаи и другие напитки. Всё из лучших ингредиентов.',
+    srv2_title:'Завтраки & Закуски', srv2_desc:'Свежие тосты, круассаны, йогурты, мюсли и лёгкие закуски для идеального начала дня.',
+    srv3_title:'Торты на заказ', srv3_desc:'Именинные торты и десерты, приготовленные с любовью из фермерских ингредиентов. Индивидуальные заказы.',
+    srv4_title:'Кофе с собой', srv4_desc:'Кофе и угощения навынос — идеально для тех, кто спешит. Упакуем аккуратно и с улыбкой.',
+    menu_label:'Наш выбор', menu_title:'<em>Карта</em> напитков',
+    tab_coffee:'☕ Кофе', tab_nonalco:'🍵 Напитки', tab_food:'🎂 Еда', tab_sweet:'🍰 Выпечка',
+    espresso_desc:'Крепкий, чистый, идеальный', capp_desc:'Эспрессо с нежной молочной пенкой',
+    fw_desc:'Двойной эспрессо с шёлковым молоком', latte_desc:'Большой стакан с нежным молоком',
+    cb_desc:'Холодное кофе 24-часового настаивания', aff_desc:'Эспрессо с ванильным мороженым',
+    svarek_desc:'Домашнее глинтвейн со специями', wien_desc:'Эспрессо со взбитыми сливками',
+    tea_desc:'Травяной, фруктовый, зелёный, чёрный', choc_desc:'Бельгийский шоколад с молоком',
+    juice_desc:'Свежевыжатый апельсин / яблоко', limo_desc:'Домашний лимонад или малиновый',
+    water_desc:'Газированная или негазированная 0,5 л', matcha_desc:'Японский зелёный чай с молоком',
+    toast_desc:'Свежий тост, ветчина, сыр, овощи', crois_desc:'Масляный круассан, свежий каждое утро',
+    yogurt_desc:'Греческий йогурт, гранола, сезонные фрукты', avo_desc:'Цельнозерновой тост, авокадо, яйцо',
+    muesli_desc:'Домашние мюсли с молоком или йогуртом', bagel_desc:'Бейгл с лососем или сыром и овощами',
+    cake_desc:'Каждый день разный — спросите персонал', cheese_desc:'Стиль Нью-Йорк, сезонный вкус',
+    tira_desc:'Классическое итальянское тирамису', brownie_desc:'Шоколадный брауни с мороженым',
+    mac_desc:'Французские макаруны, 2 штуки', bday_desc:'На заказ — свяжитесь с нами',
+    price_request:'По запросу',
+    hours_label:'Визит', hours_title:'Часы работы<br>& <em>Контакты</em>',
+    mon:'Понедельник', tue:'Вторник', wed:'Среда', thu:'Четверг ⟵', today:'сегодня',
+    fri:'Пятница', sat:'Суббота', sun:'Воскресенье',
+    addr_label:'Адрес', phone_label:'Телефон', email_label:'Эл. почта',
+    open_maps:'Открыть в Google Maps →',
+    footer_copy:'© 2024 HansPaul Kafe · Прага 6, Дейвице'
+  }
+};
+
+let currentLang = 'cs';
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = translations[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === lang.toUpperCase());
+  });
+  document.documentElement.lang = lang;
+}
+</script>
+</body>
+</html>
